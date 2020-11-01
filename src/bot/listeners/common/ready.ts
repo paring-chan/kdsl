@@ -1,3 +1,4 @@
+import { AkairoClient } from "discord-akairo";
 import { CommandUtil } from "discord-akairo";
 import { Listener } from "discord-akairo";
 import { MessageEmbed } from "discord.js";
@@ -10,15 +11,20 @@ declare module 'discord-akairo' {
         embed(): MessageEmbed
         db: Knex
     }
+    interface AkairoClient {
+        db: Knex
+    }
 }
 
 CommandUtil.prototype.db = db
+
+AkairoClient.prototype.db = db
 
 CommandUtil.prototype.embed = function() {
     const m = this.message
     return new MessageEmbed({
         footer: {
-            text: m.author.tag,
+            text: m.author.tag, 
             iconURL: m.author.displayAvatarURL({dynamic: true})
         },
         color: '#eb4034'
@@ -41,5 +47,9 @@ export default class Ready extends Listener {
         }
 
         console.info(`Shard #${this.client.shard.ids.reduce((acc,cur)=>acc+cur)} ready!`)
+
+        for (const [,guild] of this.client.guilds.cache) {
+            this.client.emit('guildCreate', guild)
+        }
     }
 }

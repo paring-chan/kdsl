@@ -49,6 +49,7 @@ export default class KDSLClient extends AkairoClient {
 
         if (config.watch) {
             chokidar.watch(this.commandHandler.directory).on('change', (path1) => {
+                delete require.cache[require.resolve(path1)]
                 for (const c of this.commandHandler.categories.values()) {
                     const cmd = c.find(r => path.resolve(r.filepath) === path.resolve(path1))
                     if (cmd) {
@@ -62,6 +63,7 @@ export default class KDSLClient extends AkairoClient {
                 console.log(`Loaded command on path ${path1}`)
             })
             chokidar.watch(this.listenerHandler.directory).on('change', (path1) => {
+                delete require.cache[require.resolve(path1)]
                 for (const c of this.listenerHandler.categories.values()) {
                     const cmd = c.find(r => path.resolve(r.filepath) === path.resolve(path1))
                     if (cmd) {
